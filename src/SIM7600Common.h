@@ -5,7 +5,7 @@
  */
 
 #pragma once
-
+#pragma warning disable VCIC001
 #include <Arduino.h>
 #include <stdarg.h>
 #include <ctype.h>
@@ -50,6 +50,9 @@
 
 // TCP max clients
 #define SIM7600_TCP_MAX_CLIENTS 10
+
+// HTTP max clients
+#define SIM7600_HTTP_MAX_CLIENTS 10
 
 // TCP max response time [ms], including some margin over data timeout for AT commands
 #define SIM7600_TCP_MAX_RESPONSE_TIME_MS 130000

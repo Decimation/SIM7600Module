@@ -6,6 +6,7 @@
 
 // ReSharper disable CppInconsistentNaming
 #pragma once
+#pragma warning (disable: VCIC001)
 
 #include "SIM7600ClientManager.h"
 #include "SIM7600Common.h"
