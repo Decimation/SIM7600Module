@@ -1,29 +1,34 @@
 // ReSharper disable CppInconsistentNaming
+// ReSharper disable CppPossiblyUninitializedMember
 #include "SIM7600HttpClient.h"
 #include "SIM7600Log.h"
 
 
+static const char* tag = "HttpClient";
+
+
 namespace SIM7600
 {
-SIM7600HttpClient::SIM7600HttpClient() : SIM7600HttpClient(nullptr)
+HttpClient::HttpClient() : HttpClient(nullptr)
 {
 }
 
-SIM7600HttpClient::SIM7600HttpClient(Modem* m) : _modem(m)
+HttpClient::HttpClient(Modem* m) : _modem(m)
 {
 }
 
-SIM7600HttpClient::~SIM7600HttpClient()
+HttpClient::~HttpClient()
 {
 	disconnect();
 }
 
-Status SIM7600HttpClient::disconnect()
+Status HttpClient::disconnect()
 {
-	
+
 }
 
-Status SIM7600HttpClient::setModem(Modem* const modem)
+
+Status HttpClient::setModem(Modem* const modem)
 {
 	if (modem == nullptr) return Status::InvalidModem;
 
@@ -34,5 +39,9 @@ Status SIM7600HttpClient::setModem(Modem* const modem)
 	_rx_buf = _modem->_rx_buf;
 
 	return Status::Success;
+}
+
+Status HttpClient::connect()
+{
 }
 }

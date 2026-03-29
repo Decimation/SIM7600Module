@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: MIT
  */
 
+// ReSharper disable CppClangTidyCertErr33C
+// ReSharper disable CppClangTidyCertErr34C
+// ReSharper disable StringLiteralTypo
 #include "SIM7600Modem.h"
 #include "SIM7600Common.h"
 #include "SIM7600Log.h"
@@ -394,8 +397,7 @@ Status Modem::parseLine(char* const buffer, const uint8_t parameters, const char
 
 	va_list args;
 	va_start(args, format);
-	//int parsed = vsscanf(buffer, format, args);
-	int parsed = my_vsscanf(buffer, format, args);
+	int parsed = vsscanf(buffer, format, args);
 	va_end(args);
 
 	if (parsed < parameters) {
@@ -1161,6 +1163,35 @@ Status Modem::stopMQTTService()
 
 	SIM7600_LOGE(tag, "Failed to stop MQTT service, err: %u", err);
 	return Status::Error;
+}
+
+Status Modem::startHttpService()
+{
+	SIM7600_LOGI(tag, "Starting HTTP service");
+
+	bool running = false;
+	// Status status  = isTCPIPServiceRunning(running);
+	auto status = Status::Error;
+
+	status = sendATCmd("AT+HTTPINIT");
+
+	if (status == Status::Success) {
+		SIM7600_LOGI(tag, "HTTP service started successfully");
+	}
+
+	return status;
+}
+
+Status Modem::stopHttpService()
+{
+	SIM7600_LOGI(tag, "Stopping HTTP service");
+
+	auto status = sendATCmd("AT+HTTPTERM");
+	if (status == Status::Success) {
+		SIM7600_LOGI(tag, "HTTP service started successfully");
+	}
+
+	return status;
 }
 
 void Modem::loop(const uint32_t duration_ms)

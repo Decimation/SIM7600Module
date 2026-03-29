@@ -4,9 +4,11 @@
  * SPDX-License-Identifier: MIT
  */
 
+// ReSharper disable CppInconsistentNaming
 #include "SIM7600Common.h"
 
-const char* SIM7600::statusToString(SIM7600::Status status)
+
+const char* SIM7600::statusToString(Status status)
 {
 #define X(name) #name,
 	static const char* status_strings[] = {SIM7600_STATUS_LIST};
@@ -15,18 +17,23 @@ const char* SIM7600::statusToString(SIM7600::Status status)
 	return status_strings[static_cast<uint8_t>(status)];
 }
 
-static void skip_ws(const char** s)
+static void skipWhitespace(const char** s)
 {
 	while (isspace(**s)) (*s)++;
 }
 
-int my_vsscanf(const char* str, const char* fmt, va_list ap)
+#ifdef TARGET_AVR
+
+/**
+ * Alternative implementation of vsscanf for boards without native support (e.g., Mega)
+ */
+int avr_vsscanf(const char* str, const char* fmt, va_list ap)
 {
 	int assigned = 0;
 
 	while (*fmt && *str) {
 		if (isspace(*fmt)) {
-			skip_ws(&str);
+			skipWhitespace(&str);
 			fmt++;
 			continue;
 		}
@@ -43,7 +50,7 @@ int my_vsscanf(const char* str, const char* fmt, va_list ap)
 		switch (*fmt) {
 			case 'd':
 			{
-				skip_ws(&str);
+				skipWhitespace(&str);
 				char* end;
 				long  val = strtol(str, &end, 10);
 				if (end == str) return assigned;
@@ -55,7 +62,7 @@ int my_vsscanf(const char* str, const char* fmt, va_list ap)
 
 			case 'u':
 			{
-				skip_ws(&str);
+				skipWhitespace(&str);
 				char*         end;
 				unsigned long val = strtoul(str, &end, 10);
 				if (end == str) return assigned;
@@ -67,7 +74,7 @@ int my_vsscanf(const char* str, const char* fmt, va_list ap)
 
 			case 'x':
 			{
-				skip_ws(&str);
+				skipWhitespace(&str);
 				char*         end;
 				unsigned long val = strtoul(str, &end, 16);
 				if (end == str) return assigned;
@@ -79,7 +86,7 @@ int my_vsscanf(const char* str, const char* fmt, va_list ap)
 
 			case 'f':
 			{
-				skip_ws(&str);
+				skipWhitespace(&str);
 				char* end;
 				float val = strtod(str, &end);
 				if (end == str) return assigned;
@@ -91,7 +98,7 @@ int my_vsscanf(const char* str, const char* fmt, va_list ap)
 
 			case 's':
 			{
-				skip_ws(&str);
+				skipWhitespace(&str);
 				char* out = va_arg(ap, char*);
 				int   i   = 0;
 				while (*str && !isspace(*str)) {
@@ -127,3 +134,5 @@ int my_vsscanf(const char* str, const char* fmt, va_list ap)
 
 	return assigned;
 }
+
+#endif

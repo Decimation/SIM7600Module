@@ -5,6 +5,7 @@
  */
 
 // ReSharper disable CppInconsistentNaming
+// ReSharper disable CppMemberFunctionMayBeStatic
 #pragma once
 
 #include <Arduino.h>

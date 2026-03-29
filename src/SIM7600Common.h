@@ -57,6 +57,9 @@
 // TCP max response time [ms], including some margin over data timeout for AT commands
 #define SIM7600_TCP_MAX_RESPONSE_TIME_MS 130000
 
+#define SIM7600_HTTP_MAX_RESPONSE_TIME_MS 130000
+
+
 // MQTT max clients
 #define SIM7600_MQTT_MAX_CLIENTS 2
 
@@ -109,10 +112,34 @@
 #endif
 #endif
 
-int my_vsscanf(const char *str, const char *fmt, va_list ap);
+#if defined(__AVR__)
+#define TARGET_AVR
+#endif
 
-namespace SIM7600 {
+#ifdef TARGET_AVR
+#warning "Device is AVR: Using custom vsscanf"
+int avr_vsscanf(const char* str, const char* fmt, va_list ap);
+#define vsscanf(s, f, __VA_ARGS__) avr_vsscanf(s, f, __VA_ARGS__)
+#endif
 
+/*static const char buf[128] PROGMEM = {};
+
+#define FormatInvoke(s, fn, ...)							\
+	memset(buf, 0, 128);									\
+	snprintf_P(buf, sizeof(buf), PSTR(s), ##__VA_ARGS__);	\
+	fn(buf)*/
+
+template<typename T>
+void FormatInvoke(String sz, void(f) [](T t), va_list va)
+{
+	static char buf[128] PROGMEM;
+	// va_list va;
+	snprintf_P(buf, sizeof buf, sz, va);
+	f(buf);
+}
+
+namespace SIM7600
+{
 // Status codes
 #define SIM7600_STATUS_LIST        \
   X(Success)                       \
@@ -148,6 +175,7 @@ namespace SIM7600 {
   X(TCPSentLessThanExpected)
 
 #define X(name) name,
+
 enum class Status { SIM7600_STATUS_LIST };
 #undef X
 
@@ -157,6 +185,4 @@ enum class Status { SIM7600_STATUS_LIST };
  * @return const char*: String representation of the status.
  */
 const char* statusToString(Status status);
-
-
 } // namespace SIM7600

@@ -1,4 +1,4 @@
-// SIM7600HttpClient.h
+// HttpClient.h
 
 // ReSharper disable CppInconsistentNaming
 #pragma once
@@ -15,16 +15,16 @@
 
 namespace SIM7600
 {
-class SIM7600HttpClient : public ClientManager<SIM7600HttpClient, SIM7600_HTTP_MAX_CLIENTS>
+class HttpClient : public ClientManager<HttpClient, SIM7600_HTTP_MAX_CLIENTS>
 {
 public:
-	SIM7600HttpClient();
-	SIM7600HttpClient(Modem* m);
-	~SIM7600HttpClient();
+	HttpClient();
+	HttpClient(Modem* m);
+	~HttpClient();
 
-	Status setModem(Modem* const modem);
+	Status setModem(Modem* const modem); 
 
-	Status init();
+	Status connect();
 	Status disconnect();
 
 private:

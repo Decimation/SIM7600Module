@@ -5,6 +5,7 @@
  */
 
 // ReSharper disable CppInconsistentNaming
+// ReSharper disable CppClangTidyClangDiagnosticPadded
 #pragma once
 #pragma warning (disable: VCIC001)
 
