@@ -24,7 +24,6 @@ HttpClient::~HttpClient()
 
 Status HttpClient::disconnect()
 {
-
 }
 
 
@@ -43,5 +42,21 @@ Status HttpClient::setModem(Modem* const modem)
 
 Status HttpClient::connect()
 {
+}
+
+Status HttpClient::addPara(HttpPara para, const char* val)
+{
+	Status status;
+	status = _modem->sendATCmd("AT+HTTPPARA=\"%s\",\"%s\"", ParaToString(para), val);
+	if (status != Status::Success) return status;
+
+	return status;
+}
+
+const char* ParaToString(const HttpPara para)
+{
+	auto f = paras_dict.find(para);
+
+	return (*f).second;
 }
 }

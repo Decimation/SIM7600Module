@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+// ReSharper disable CppInconsistentNaming
 #pragma once
 #pragma warning disable VCIC001
 #include <Arduino.h>
@@ -122,12 +123,7 @@ int avr_vsscanf(const char* str, const char* fmt, va_list ap);
 #define vsscanf(s, f, ...) avr_vsscanf(s, f, ##__VA_ARGS__)
 #endif
 
-/*static const char buf[128] PROGMEM = {};
 
-#define FormatInvoke(s, fn, ...)							\
-	memset(buf, 0, 128);									\
-	snprintf_P(buf, sizeof(buf), PSTR(s), ##__VA_ARGS__);	\
-	fn(buf)*/
 
 template <typename Callback>
 void FormatInvoke(PGM_P fmt, Callback cb, ...)
@@ -136,18 +132,19 @@ void FormatInvoke(PGM_P fmt, Callback cb, ...)
 
 	va_list va;
 	va_start(va, cb);
-	vsnprintf_P(buf, sizeof(buf), fmt, va); // use vsnprintf_P with va_list
+	vsnprintf_P(buf, sizeof(buf), fmt, va);
 	va_end(va);
 
-	cb(buf); // invoke lambda/callback
+	cb(buf);
 }
 
-#define FmtInvoke(s, inner, ...)					\
+#define FormatInvokeF(s, inner, ...)				\
 	FormatInvoke(PSTR(s), [](const char* str) {		\
 		inner(str);									\
 	}, ##__VA_ARGS__)								\
-	
 
+#define FormatInvokeF2(s, sel, ...)					\
+	FormatInvokeF(s, Serial.print##sel, ##__VA_ARGS__)
 
 namespace SIM7600
 {
