@@ -5,6 +5,7 @@
  */
 
 // ReSharper disable CppInconsistentNaming
+// ReSharper disable CppClangTidyMiscUseAnonymousNamespace
 #include "SIM7600Common.h"
 
 
@@ -25,7 +26,7 @@ static void skipWhitespace(const char** s)
 #ifdef TARGET_AVR
 
 /**
- * Alternative implementation of vsscanf for boards without native support (e.g., Mega)
+ * @details Alternative implementation of vsscanf for boards without native support (e.g., Mega)
  */
 int avr_vsscanf(const char* str, const char* fmt, va_list ap)
 {

@@ -1,6 +1,7 @@
 // HttpClient.h
 
 // ReSharper disable CppInconsistentNaming
+// ReSharper disable CppRedundantCastExpression
 #pragma once
 
 #include <new>
@@ -23,7 +24,7 @@
 
 namespace SIM7600
 {
-enum class HttpPara
+enum class HttpParameter
 {
 	URL,
 	ConnectTimeout,
@@ -39,20 +40,21 @@ enum class HttpPara
 	COUNT
 };
 
-static const size_t MAP_SIZE = static_cast<size_t>(HttpPara::COUNT);
+static const size_t MAP_SIZE = static_cast<size_t>(HttpParameter::COUNT);
 
 class HttpClient : public ClientManager<HttpClient, SIM7600_HTTP_MAX_CLIENTS>
 {
 public:
 	HttpClient();
-	HttpClient(Modem* m);
+	explicit HttpClient(Modem* m);
 	~HttpClient();
 
 	Status setModem(Modem* const modem);
 
 	Status connect();
 	Status disconnect();
-	Status addPara(HttpPara, const char*);
+	Status addPara(HttpParameter, const char*);
+	Status HttpClient::readHead(uint8_t* outBuf, size_t* outBufLen);
 
 private:
 	Modem* _modem;
@@ -61,23 +63,20 @@ private:
 };
 
 
-#define AddMapEntryS(e, s) {e, #s}
-#define AddMapEntry(e) AddMapEntryS(e,e)
-
-static const arx::stdx::map<HttpPara, const char*, MAP_SIZE> paras_dict =
+static const arx::stdx::map<HttpParameter, const char*, MAP_SIZE> paras_dict =
 {
-	AddMapEntry(HttpPara::URL),
-	AddMapEntryS(HttpPara::ConnectTimeout, "CONNECTTO"),
-	AddMapEntryS(HttpPara::ReceiveTimeout, "RECVTO"),
-	AddMapEntryS(HttpPara::ContentType, "CONTENT"),
-	AddMapEntry(HttpPara::Accept),
-	AddMapEntryS(HttpPara::UserAgent, "UA"),
-	AddMapEntry(HttpPara::SslCfg),
-	AddMapEntry(HttpPara::UserData),
-	AddMapEntry(HttpPara::Break),
-	AddMapEntry(HttpPara::BreakEnd),
-	AddMapEntryS(HttpPara::RespTimeout, "RESPTO"),
+	AddMap_K(HttpParameter::URL),
+	AddMap_KS(HttpParameter::ConnectTimeout, "CONNECTTO"),
+	AddMap_KS(HttpParameter::ReceiveTimeout, "RECVTO"),
+	AddMap_KS(HttpParameter::ContentType, "CONTENT"),
+	AddMap_K(HttpParameter::Accept),
+	AddMap_KS(HttpParameter::UserAgent, "UA"),
+	AddMap_K(HttpParameter::SslCfg),
+	AddMap_K(HttpParameter::UserData),
+	AddMap_K(HttpParameter::Break),
+	AddMap_K(HttpParameter::BreakEnd),
+	AddMap_KS(HttpParameter::RespTimeout, "RESPTO"),
 };
 
-const char* ParaToString(HttpPara para);
+const char* ParaToString(HttpParameter para);
 }

@@ -123,28 +123,40 @@ int avr_vsscanf(const char* str, const char* fmt, va_list ap);
 #define vsscanf(s, f, ...) avr_vsscanf(s, f, ##__VA_ARGS__)
 #endif
 
+using FormatInvokeFunction = void (*) (const char*);
 
-
-template <typename Callback>
-void FormatInvoke(PGM_P fmt, Callback cb, ...)
+void FormatInvoke(const char* fmt, ...)
 {
-	char buf[128]; // must be RAM, not PROGMEM
-
+	char    buf[128]; // must be RAM, not PROGMEM
 	va_list va;
-	va_start(va, cb);
+	va_start(va, fmt);
 	vsnprintf_P(buf, sizeof(buf), fmt, va);
 	va_end(va);
-
-	cb(buf);
+	Serial.println(buf);
 }
 
-#define FormatInvokeF(s, inner, ...)				\
-	FormatInvoke(PSTR(s), [](const char* str) {		\
+/*#define FormatInvokeF(s, inner, ...)				\
+	FormatInvoke(s, [](const char* str) {			\
 		inner(str);									\
-	}, ##__VA_ARGS__)								\
+	}, ##__VA_ARGS__)*/
 
-#define FormatInvokeF2(s, sel, ...)					\
-	FormatInvokeF(s, Serial.print##sel, ##__VA_ARGS__)
+/*#define FormatInvokeF2(s, sel, ...)					\
+	FormatInvoke(s, Serial.print##sel, ##__VA_ARGS__)*/
+
+/*static void FormatInvokeF2(const char* s, ...)
+{
+	va_list va;
+	va_start(va, s);
+	FormatInvoke(s, [](const char* s2)
+	{
+		Serial.println(s2);
+	}, va);
+	va_end(va);
+}*/
+
+#define AddMap_KS(e, s) {e, #s}
+#define AddMap_K(e) AddMap_KS(e, e)
+
 
 namespace SIM7600
 {
