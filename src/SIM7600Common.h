@@ -119,7 +119,7 @@
 #ifdef TARGET_AVR
 #warning "Device is AVR: Using custom vsscanf"
 int avr_vsscanf(const char* str, const char* fmt, va_list ap);
-#define vsscanf(s, f, __VA_ARGS__) avr_vsscanf(s, f, __VA_ARGS__)
+#define vsscanf(s, f, ...) avr_vsscanf(s, f, ##__VA_ARGS__)
 #endif
 
 /*static const char buf[128] PROGMEM = {};
@@ -129,14 +129,25 @@ int avr_vsscanf(const char* str, const char* fmt, va_list ap);
 	snprintf_P(buf, sizeof(buf), PSTR(s), ##__VA_ARGS__);	\
 	fn(buf)*/
 
-template<typename T>
-void FormatInvoke(String sz, void(f) [](T t), va_list va)
+template <typename Callback>
+void FormatInvoke(PGM_P fmt, Callback cb, ...)
 {
-	static char buf[128] PROGMEM;
-	// va_list va;
-	snprintf_P(buf, sizeof buf, sz, va);
-	f(buf);
+	char buf[128]; // must be RAM, not PROGMEM
+
+	va_list va;
+	va_start(va, cb);
+	vsnprintf_P(buf, sizeof(buf), fmt, va); // use vsnprintf_P with va_list
+	va_end(va);
+
+	cb(buf); // invoke lambda/callback
 }
+
+#define FmtInvoke(s, inner, ...)					\
+	FormatInvoke(PSTR(s), [](const char* str) {		\
+		inner(str);									\
+	}, ##__VA_ARGS__)								\
+	
+
 
 namespace SIM7600
 {
