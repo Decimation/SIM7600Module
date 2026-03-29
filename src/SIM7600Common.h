@@ -7,7 +7,9 @@
 #pragma once
 
 #include <Arduino.h>
-
+#include <stdarg.h>
+#include <ctype.h>
+#include <stdlib.h>
 // Configuration macros
 
 // AT command new line sequence
@@ -104,6 +106,8 @@
 #endif
 #endif
 
+int my_vsscanf(const char *str, const char *fmt, va_list ap);
+
 namespace SIM7600 {
 
 // Status codes
@@ -150,5 +154,6 @@ enum class Status { SIM7600_STATUS_LIST };
  * @return const char*: String representation of the status.
  */
 const char* statusToString(Status status);
+
 
 } // namespace SIM7600

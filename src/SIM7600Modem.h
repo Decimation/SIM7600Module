@@ -7,6 +7,7 @@
 #pragma once
 
 #include "SIM7600Common.h"
+#include <IPAddress.h>
 
 namespace SIM7600 {
 

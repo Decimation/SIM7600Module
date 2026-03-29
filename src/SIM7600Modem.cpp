@@ -5,8 +5,8 @@
  */
 
 #include "SIM7600Modem.h"
+#include "SIM7600Common.h"
 #include "SIM7600Log.h"
-
 static const char* tag = "SIM7600Modem";
 
 namespace SIM7600 {
@@ -368,13 +368,16 @@ Status Modem::readBytes(uint8_t* const buffer, const size_t buffer_size, const s
   return Status::Timeout;
 }
 
+
+
 Status Modem::parseLine(char* const buffer, const uint8_t parameters, const char* format, ...) {
   if (buffer == nullptr || format == nullptr) return Status::InvalidBuffer;
   if (parameters == 0) return Status::InvalidParameter;
 
   va_list args;
   va_start(args, format);
-  int parsed = vsscanf(buffer, format, args);
+  //int parsed = vsscanf(buffer, format, args);
+  int parsed = my_vsscanf(buffer, format, args);
   va_end(args);
 
   if (parsed < parameters) {
@@ -686,9 +689,9 @@ Status Modem::getGPSData(GPSData& gps_data) {
     switch (index) {
       case 0:
       {
-        uint8_t fix_mode_value;
+        GPSFixStatus fix_mode;
 
-        if (sscanf(token, "%hhu", &fix_mode_value) != 1) {
+        if (sscanf(token, "%u", &fix_mode) != 1) {
           SIM7600_LOGE(tag, "Failed to parse GPS fix mode");
 
           // Wait for OK
@@ -698,22 +701,20 @@ Status Modem::getGPSData(GPSData& gps_data) {
           return Status::InvalidResponse;
         }
 
-        gps_data.fix_status = static_cast<GPSFixStatus>(fix_mode_value);
+        gps_data.fix_status = fix_mode;
       } break;
 
-      case 1: sscanf(token, "%hhu", &gps_data.gps_satellites); break;
-      case 2: sscanf(token, "%hhu", &gps_data.glonass_satellites); break;
-      case 3: sscanf(token, "%hhu", &gps_data.beidou_satellites); break;
+      case 1: sscanf(token, "%u", &gps_data.gps_satellites); break;
+      case 2: sscanf(token, "%u", &gps_data.glonass_satellites); break;
+      case 3: sscanf(token, "%u", &gps_data.beidou_satellites); break;
       case 4: sscanf(token, "%lf", &gps_data.latitude); break;
       case 5: n_s = token[0]; break;
       case 6: sscanf(token, "%lf", &gps_data.longitude); break;
       case 7: e_w = token[0]; break;
       case 8:
-      {
-        uint8_t year_value;
-        sscanf(token, "%2hhu%2hhu%2hhu", &gps_data.day, &gps_data.month, &year_value);
-        gps_data.year = year_value + 2000;
-      } break;
+        sscanf(token, "%2hhu%2hhu%2hhu", &gps_data.day, &gps_data.month, &gps_data.year);
+        gps_data.year += 2000;
+        break;
       case 9:
       {
         float sec;
