@@ -20,6 +20,12 @@ using std::size_t;
 
 // using size_t = __SIZE_TYPE__;
 
+enum class SmsFormat : uint8_t
+{
+	PDU = 0,
+	Text = 1
+};
+
 /// @brief SIM card status.
 enum class SIMStatus { Ready = 0, PinWaiting, Error };
 
@@ -142,6 +148,10 @@ public:
 	 * @param serial Serial port.
 	 */
 	Modem(Stream* serial);
+
+	Status setSmsFormat(SmsFormat mode);
+
+	Status sendSMS(String num, String str);
 
 	/**
 	 * @brief Set the Serial Port object to be used by the modem.

@@ -23,6 +23,15 @@ static void skipWhitespace(const char** s)
 	while (isspace(**s)) (*s)++;
 }
 
+void FormatInvoke(const char* fmt, ...)
+{
+	char                   buf[128] = {}; // must be RAM, not PROGMEM
+	va_list va;
+	va_start(va, fmt);
+	vsnprintf_P(buf, sizeof(buf), fmt, va);
+	va_end(va);
+	Serial.println(buf);
+}
 #ifdef TARGET_AVR
 
 /**

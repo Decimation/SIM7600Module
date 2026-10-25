@@ -3,12 +3,12 @@
  *
  * SPDX-License-Identifier: MIT
  */
+#pragma disable E0351
 
 // ReSharper disable CppClangTidyCertErr33C
 // ReSharper disable CppClangTidyCertErr34C
 // ReSharper disable StringLiteralTypo
 #include "SIM7600Modem.h"
-#include "SIM7600Common.h"
 #include "SIM7600Log.h"
 static const char* tag = "SIM7600Modem";
 
@@ -45,7 +45,36 @@ Modem::Modem(Stream* serial)
 	memset(_urc_handlers, 0, sizeof(_urc_handlers));
 }
 
-void Modem::setSerialPort(Stream* serial) { _serial = serial; }
+Status Modem::setSmsFormat(const SmsFormat mode)
+{
+	char buf[64] = {0};
+	sprintf(buf, "AT+CMGF=%u", static_cast<uint8_t>(mode));
+
+	auto setTxtMode = sendATCmdAndWaitResp(buf,AT_OK);
+
+	return setTxtMode;
+}
+
+Status Modem::sendSMS(String num, String str)
+{
+	char buf[64] = {0};
+	sprintf(buf, "AT+CMGS=\"%s\"", num.c_str());
+
+	const auto status = sendATCmdAndWaitResp(buf, ">", 15000);
+	SIM7600_LOGD(tag, "Sending text: %s", SIM::statusToString(status));
+
+	auto str2= str + "\x1A";
+
+	auto status2 = sendATCmdAndWaitResp(str2.c_str(), "+CMGS:");
+	SIM7600_LOGD(tag, "Sending text status: %s", SIM::statusToString(status2));
+
+	return status2;
+}
+
+void Modem::setSerialPort(Stream* serial)
+{
+	_serial = serial;
+}
 
 Status Modem::setModemReadyCallback(ModemReadyCB callback)
 {
@@ -87,7 +116,6 @@ Status Modem::init(const char* pin, const uint32_t timeout_ms)
 	SIM7600_LOGD(tag, "Disabling echo");
 	status = sendATCmdAndWaitResp("ATE0", AT_OK);
 	if (status != Status::Success) return status;
-
 #if SIM7600_LOG_VERBOSE_ERROR_CODES
 	// Enable verbose errors
 	SIM7600_LOGD(tag, "Enabling verbose errors");
@@ -1171,7 +1199,7 @@ Status Modem::startHttpService()
 
 	bool running = false;
 	// Status status  = isTCPIPServiceRunning(running);
-	auto status = Status::Error;
+	auto status  = Status::Error;
 
 	status = sendATCmd("AT+HTTPINIT");
 

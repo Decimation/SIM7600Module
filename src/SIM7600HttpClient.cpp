@@ -25,6 +25,7 @@ HttpClient::~HttpClient()
 
 Status HttpClient::disconnect()
 {
+	return {};
 }
 
 
@@ -43,6 +44,7 @@ Status HttpClient::setModem(Modem* const modem)
 
 Status HttpClient::connect()
 {
+	return {};
 }
 
 Status HttpClient::readHead(uint8_t* outBuf, size_t* outBufLen)
@@ -83,6 +85,6 @@ const char* ParaToString(const HttpParameter para)
 {
 	auto f = paras_dict.find(para);
 
-	return (*f).second;
+	return f->second;
 }
 }

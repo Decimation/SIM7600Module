@@ -125,15 +125,8 @@ int avr_vsscanf(const char* str, const char* fmt, va_list ap);
 
 using FormatInvokeFunction = void (*) (const char*);
 
-void FormatInvoke(const char* fmt, ...)
-{
-	char    buf[128]; // must be RAM, not PROGMEM
-	va_list va;
-	va_start(va, fmt);
-	vsnprintf_P(buf, sizeof(buf), fmt, va);
-	va_end(va);
-	Serial.println(buf);
-}
+void FormatInvoke(const char* fmt, ...);
+
 
 /*#define FormatInvokeF(s, inner, ...)				\
 	FormatInvoke(s, [](const char* str) {			\
