@@ -117,18 +117,25 @@
 #define TARGET_AVR
 #endif
 
+/**
+ * @brief Define missing AVR functions
+ */
 #ifdef TARGET_AVR
 #warning "Device is AVR: Using custom vsscanf"
 int avr_vsscanf(const char* str, const char* fmt, va_list ap);
 #define vsscanf(s, f, ...) avr_vsscanf(s, f, ##__VA_ARGS__)
 #endif
 
+/**
+ * @brief Define @p ParasMap
+ */
+
 #ifdef TARGET_AVR
 #include <ArxContainer.h>
 #include <new.h>
 
-#define avr_map(K,V,L) arx::stdx::map<K,V,L>
-#define ParasMap avr_map(HttpParameter, const char*, MAP_SIZE)
+static const size_t MAP_SIZE = static_cast<size_t>(HttpParameter::COUNT);
+#define ParasMap arx::stdx::map<HttpParameter, const char*, MAP_SIZE>
 
 #else
 
@@ -137,30 +144,12 @@ int avr_vsscanf(const char* str, const char* fmt, va_list ap);
 
 #endif
 
-// void FormatInvoke(const char* fmt, ...);
-
-/*#define FormatInvokeF(s, inner, ...)				\
-	FormatInvoke(s, [](const char* str) {			\
-		inner(str);									\
-	}, ##__VA_ARGS__)*/
-
-/*#define FormatInvokeF2(s, sel, ...)					\
-	FormatInvoke(s, Serial.print##sel, ##__VA_ARGS__)*/
-
-/*static void FormatInvokeF2(const char* s, ...)
-{
-	va_list va;
-	va_start(va, s);
-	FormatInvoke(s, [](const char* s2)
-	{
-		Serial.println(s2);
-	}, va);
-	va_end(va);
-}*/
-
+/**
+ * @brief Inline initialization field with name @p e and value @p s
+ */
 #define AddMap_KS(e, s) {e, #s}
-#define AddMap_K(e) AddMap_KS(e, e)
 
+#define AddMap_K(e) AddMap_KS(e, e)
 
 namespace SIM7600
 {

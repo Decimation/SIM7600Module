@@ -34,7 +34,6 @@ enum class HttpParameter
 	COUNT
 };
 
-static const size_t MAP_SIZE = static_cast<size_t>(HttpParameter::COUNT);
 
 class HttpClient : public ClientManager<HttpClient, SIM7600_HTTP_MAX_CLIENTS>
 {
@@ -48,7 +47,7 @@ public:
 	Status connect();
 	Status disconnect();
 	Status addParameter(HttpParameter, const char*) const;
-	Status readHead(uint8_t* outBuf, size_t* outBufLen);
+	Status readHead(uint8_t* outBuf, size_t* outBufLen) const;
 
 private:
 	Modem* _modem;

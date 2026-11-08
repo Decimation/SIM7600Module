@@ -11,6 +11,9 @@
 // ReSharper disable StringLiteralTypo
 
 #include "SIM7600Modem.h"
+
+#include <api/String.h>
+
 #include "SIM7600Log.h"
 static const char* tag = "SIM7600Modem";
 
@@ -47,32 +50,56 @@ Modem::Modem(Stream* serial)
 	memset(_urc_handlers, 0, sizeof(_urc_handlers));
 }
 
-Status Modem::setSmsFormat(const SmsFormat mode)
+Status Modem::dispatchCall(const char* num, uint32_t timeout_ms, const char* extraArgs)
+{
+	char buf[64] = {};
+	memset(buf, 0, sizeof(buf));
+	snprintf(buf, "ATD%s", num);
+	const char* buf2 = extraArgs != nullptr ? strcat(buf, extraArgs) : buf;
+
+	/*
+	char connectStr[64] = {};
+	memset(connectStr, 0, sizeof(connectStr));
+	snprintf(connectStr, sizeof(connectStr), "CONNECT%s", num);
+	*/
+
+	auto atConnect = sendATCmdAndWaitResp(buf2, "CONNECT", timeout_ms);
+
+	return atConnect;
+}
+
+Status Modem::setSmsFormat(const SmsFormat mode, const uint32_t timeout_ms)
 {
 	char buf[64] = {};
 	memset(buf, 0, sizeof(buf));
 	snprintf(buf, sizeof(buf), "AT+CMGF=%d", static_cast<uint8_t>(mode));
 	SIM7600_LOGD(tag, buf);
 
-	auto setTxtMode = sendATCmdAndWaitResp(buf,AT_OK, 15000);
+	auto setTxtMode = sendATCmdAndWaitResp(buf,AT_OK, timeout_ms);
 
 	return setTxtMode;
 }
 
-Status Modem::sendSMS(String num, String str)
+Status Modem::sendSms(const char* num, const char* msg, const uint32_t timeout_ms)
 {
 	char buf[64] = {};
 	memset(buf, 0, sizeof(buf));
-	snprintf(buf, sizeof(buf), "AT+CMGS=\"%s\"", num.c_str());
+	snprintf(buf, sizeof(buf), "AT+CMGS=\"%s\"", num);
 
 	SIM7600_LOGD(tag, buf);
 
-	const auto status = sendATCmdAndWaitResp(buf, ">", 15000);
+	const auto status = sendATCmdAndWaitResp(buf, ">", timeout_ms);
 	SIM7600_LOGD(tag, "Sending text: %s", statusToString(status));
 
-	auto str2 = str + "\x1A";
+	// todo: verify this block
+	auto len = strnlen(msg) + 2;
+	char msg2[len] = {};
+	memset(msg2, 0, sizeof(msg2));
+	auto str2    = strncpy(msg2, msg);
+	str2[len - 1] = '\x1A';
+	
 
-	auto status2 = sendATCmdAndWaitResp(str2.c_str(), "+CMGS:", 15000);
+	auto status2 = sendATCmdAndWaitResp(str2, "+CMGS:", timeout_ms);
 	SIM7600_LOGD(tag, "Sending text status: %s", statusToString(status2));
 
 	return status2;
@@ -152,15 +179,15 @@ Status Modem::init(const char* pin, const uint32_t timeout_ms)
 	if (status != Status::Success) return status;
 
 	// Check if PIN is required
-	SIMStatus sim_status;
+	SimStatus sim_status;
 	status = getSIMStatus(sim_status);
 	if (status != Status::Success) return status;
 
 	// No PIN required
-	if (sim_status == SIMStatus::Ready) return Status::Success;
+	if (sim_status == SimStatus::Ready) return Status::Success;
 
 	// No PIN required but probably PUK is needed or SIM error
-	if (sim_status == SIMStatus::Error) return Status::Error;
+	if (sim_status == SimStatus::Error) return Status::Error;
 
 	// PIN is required but not provided
 	if (pin == nullptr) {
@@ -176,7 +203,7 @@ Status Modem::init(const char* pin, const uint32_t timeout_ms)
 	status = getSIMStatus(sim_status);
 	if (status != Status::Success) return status;
 
-	if (sim_status != SIMStatus::Ready) {
+	if (sim_status != SimStatus::Ready) {
 		SIM7600_LOGE(tag, "PIN required to unlock SIM");
 		return Status::PINRequired;
 	}
@@ -461,7 +488,7 @@ Status Modem::testAT(const uint32_t timeout_ms)
 	return Status::Timeout;
 }
 
-Status Modem::getSIMStatus(SIMStatus& sim_status)
+Status Modem::getSIMStatus(SimStatus& sim_status)
 {
 	SIM7600_LOGD(tag, "Checking SIM status");
 
@@ -473,15 +500,15 @@ Status Modem::getSIMStatus(SIMStatus& sim_status)
 
 	switch (found_index) {
 		case 0:
-			sim_status = SIMStatus::Ready;
+			sim_status = SimStatus::Ready;
 			SIM7600_LOGD(tag, "SIM status: Ready");
 			break;
 		case 1:
-			sim_status = SIMStatus::PinWaiting;
+			sim_status = SimStatus::PinWaiting;
 			SIM7600_LOGD(tag, "SIM status: PIN waiting");
 			break;
 		default:
-			sim_status = SIMStatus::Error;
+			sim_status = SimStatus::Error;
 			SIM7600_LOGE(tag, "SIM status: Error");
 			break;
 	}

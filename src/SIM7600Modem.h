@@ -27,7 +27,7 @@ enum class SmsFormat : uint8_t
 };
 
 /// @brief SIM card status.
-enum class SIMStatus { Ready = 0, PinWaiting, Error };
+enum class SimStatus { Ready = 0, PinWaiting, Error };
 
 /// @brief Network mode (3G, 4G, etc.). Default is Automatic.
 enum class NetworkMode
@@ -149,9 +149,11 @@ public:
 	 */
 	Modem(Stream* serial);
 
-	Status setSmsFormat(SmsFormat mode);
+	Status dispatchCall(const char* num, uint32_t timeout_ms = SIM7600_HTTP_MAX_RESPONSE_TIME_MS, const char* extraArgs = nullptr);
 
-	Status sendSMS(String num, String str);
+	Status setSmsFormat(SmsFormat mode, uint32_t timeout_ms = SIM7600_HTTP_MAX_RESPONSE_TIME_MS);
+
+	Status sendSms(const char* num, const char* msg, uint32_t timeout_ms = SIM7600_HTTP_MAX_RESPONSE_TIME_MS);
 
 	/**
 	 * @brief Set the Serial Port object to be used by the modem.
@@ -324,7 +326,7 @@ public:
 	 * @param sim_status SIMStatus enum to store the SIM card status.
 	 * @return Status::Success on success, error code otherwise.
 	 */
-	Status getSIMStatus(SIMStatus& sim_status);
+	Status getSIMStatus(SimStatus& sim_status);
 
 	/**
 	 * @brief Unlock the SIM card with the given PIN code.

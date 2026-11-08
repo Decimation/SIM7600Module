@@ -47,7 +47,7 @@ Status HttpClient::connect()
 	return {};
 }
 
-Status HttpClient::readHead(uint8_t* outBuf, size_t* outBufLen)
+Status HttpClient::readHead(uint8_t* outBuf, size_t* outBufLen) const
 {
 	auto res = _modem->sendATCmdAndWaitResp("AT+HTTPHEAD", "+HTTPHEAD:");
 
