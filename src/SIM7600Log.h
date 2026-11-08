@@ -23,7 +23,7 @@
 #ifndef SIM7600_LOG_STREAM
 #define SIM7600_LOG_STREAM Serial
 #endif
-
+	
 // Enable verbose error codes, only printed when log level is ERROR or higher
 #ifndef SIM7600_LOG_VERBOSE_ERROR_CODES
 #define SIM7600_LOG_VERBOSE_ERROR_CODES 0

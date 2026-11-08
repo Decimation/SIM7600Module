@@ -53,7 +53,7 @@ public:
 
 	Status connect();
 	Status disconnect();
-	Status addPara(HttpParameter, const char*);
+	Status addParameter(HttpParameter, const char*) const;
 	Status HttpClient::readHead(uint8_t* outBuf, size_t* outBufLen);
 
 private:
@@ -63,7 +63,7 @@ private:
 };
 
 
-static const arx::stdx::map<HttpParameter, const char*, MAP_SIZE> paras_dict =
+static const arx::stdx::map<HttpParameter, const char*, MAP_SIZE> HttpParasMap =
 {
 	AddMap_K(HttpParameter::URL),
 	AddMap_KS(HttpParameter::ConnectTimeout, "CONNECTTO"),
@@ -78,5 +78,5 @@ static const arx::stdx::map<HttpParameter, const char*, MAP_SIZE> paras_dict =
 	AddMap_KS(HttpParameter::RespTimeout, "RESPTO"),
 };
 
-const char* ParaToString(HttpParameter para);
+const char* parameterToString(HttpParameter para);
 }

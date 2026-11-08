@@ -123,10 +123,8 @@ int avr_vsscanf(const char* str, const char* fmt, va_list ap);
 #define vsscanf(s, f, ...) avr_vsscanf(s, f, ##__VA_ARGS__)
 #endif
 
-using FormatInvokeFunction = void (*) (const char*);
 
-void FormatInvoke(const char* fmt, ...);
-
+// void FormatInvoke(const char* fmt, ...);
 
 /*#define FormatInvokeF(s, inner, ...)				\
 	FormatInvoke(s, [](const char* str) {			\

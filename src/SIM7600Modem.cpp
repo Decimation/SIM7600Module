@@ -3,11 +3,13 @@
  *
  * SPDX-License-Identifier: MIT
  */
+// ReSharper disable CppInconsistentNaming
 #pragma disable E0351
 
 // ReSharper disable CppClangTidyCertErr33C
 // ReSharper disable CppClangTidyCertErr34C
 // ReSharper disable StringLiteralTypo
+
 #include "SIM7600Modem.h"
 #include "SIM7600Log.h"
 static const char* tag = "SIM7600Modem";
@@ -47,26 +49,31 @@ Modem::Modem(Stream* serial)
 
 Status Modem::setSmsFormat(const SmsFormat mode)
 {
-	char buf[64] = {0};
-	sprintf(buf, "AT+CMGF=%u", static_cast<uint8_t>(mode));
+	char buf[64] = {};
+	memset(buf, 0, sizeof(buf));
+	snprintf(buf, sizeof(buf), "AT+CMGF=%d", static_cast<uint8_t>(mode));
+	SIM7600_LOGD(tag, buf);
 
-	auto setTxtMode = sendATCmdAndWaitResp(buf,AT_OK);
+	auto setTxtMode = sendATCmdAndWaitResp(buf,AT_OK, 15000);
 
 	return setTxtMode;
 }
 
 Status Modem::sendSMS(String num, String str)
 {
-	char buf[64] = {0};
-	sprintf(buf, "AT+CMGS=\"%s\"", num.c_str());
+	char buf[64] = {};
+	memset(buf, 0, sizeof(buf));
+	snprintf(buf, sizeof(buf), "AT+CMGS=\"%s\"", num.c_str());
+
+	SIM7600_LOGD(tag, buf);
 
 	const auto status = sendATCmdAndWaitResp(buf, ">", 15000);
-	SIM7600_LOGD(tag, "Sending text: %s", SIM::statusToString(status));
+	SIM7600_LOGD(tag, "Sending text: %s", statusToString(status));
 
-	auto str2= str + "\x1A";
+	auto str2 = str + "\x1A";
 
-	auto status2 = sendATCmdAndWaitResp(str2.c_str(), "+CMGS:");
-	SIM7600_LOGD(tag, "Sending text status: %s", SIM::statusToString(status2));
+	auto status2 = sendATCmdAndWaitResp(str2.c_str(), "+CMGS:", 15000);
+	SIM7600_LOGD(tag, "Sending text status: %s", statusToString(status2));
 
 	return status2;
 }

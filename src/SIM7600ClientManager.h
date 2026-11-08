@@ -28,8 +28,7 @@ protected:
 	uint8_t _client_id;
 	bool    _client_usable;
 
-	ClientManager() : _client_id(0),
-	                  _client_usable(true)
+	ClientManager() : _client_id(0), _client_usable(true)
 	{
 		if (_clients_used >= MAX_CLIENTS) {
 			_client_usable = false;
