@@ -4,23 +4,17 @@
 // ReSharper disable CppRedundantCastExpression
 #pragma once
 
-#include <new>
 
 #include "SIM7600Common.h"
 #include "SIM7600ClientManager.h"
 #include "SIM7600Modem.h"
 #include <stdlib.h>
+
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
 #else
 #include "WProgram.h"
 #endif
-
-#ifdef TARGET_AVR
-#include <ArxContainer.h>
-#endif
-#include <new.h>
-
 
 namespace SIM7600
 {
@@ -54,7 +48,7 @@ public:
 	Status connect();
 	Status disconnect();
 	Status addParameter(HttpParameter, const char*) const;
-	Status HttpClient::readHead(uint8_t* outBuf, size_t* outBufLen);
+	Status readHead(uint8_t* outBuf, size_t* outBufLen);
 
 private:
 	Modem* _modem;
@@ -63,7 +57,7 @@ private:
 };
 
 
-static const arx::stdx::map<HttpParameter, const char*, MAP_SIZE> HttpParasMap =
+static const ParasMap HttpParasMap =
 {
 	AddMap_K(HttpParameter::URL),
 	AddMap_KS(HttpParameter::ConnectTimeout, "CONNECTTO"),

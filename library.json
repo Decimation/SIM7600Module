@@ -13,6 +13,5 @@
   "keywords": "arduino, sim, simcom, sim7600, gsm, gprs, lte, gps, gnss, mqtt, http, ftp, tcp, udp, iot, cellular, modem, 4g, comm, communication, cloud, data, client",
   "license": "MIT",
   "frameworks": "arduino",
-  "platforms": "*",
-  "headers": ["SIM7600Modem.h", "SIM7600TCPClient.h", "SIM7600MQTTClient.h", "SIM7600HttpClient.h", "SIM7600Common.h","SIM7600ClientManager.h", "SIM7600Log.h"]
+  "platforms": "*"
 }

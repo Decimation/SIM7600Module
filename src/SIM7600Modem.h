@@ -11,7 +11,7 @@
 
 #include "SIM7600Common.h"
 #include <IPAddress.h>
-#include <new>
+#include <functional>
 
 namespace SIM7600
 {

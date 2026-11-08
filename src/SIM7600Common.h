@@ -123,6 +123,19 @@ int avr_vsscanf(const char* str, const char* fmt, va_list ap);
 #define vsscanf(s, f, ...) avr_vsscanf(s, f, ##__VA_ARGS__)
 #endif
 
+#ifdef TARGET_AVR
+#include <ArxContainer.h>
+#include <new.h>
+
+#define avr_map(K,V,L) arx::stdx::map<K,V,L>
+#define ParasMap avr_map(HttpParameter, const char*, MAP_SIZE)
+
+#else
+
+#include <map>
+#define ParasMap std::map<HttpParameter, const char*>
+
+#endif
 
 // void FormatInvoke(const char* fmt, ...);
 

@@ -2,7 +2,7 @@
 // ReSharper disable CppPossiblyUninitializedMember
 #include "SIM7600HttpClient.h"
 #include "SIM7600Log.h"
-
+#include "SIM7600Common.h"
 
 static const char* tag = "HttpClient";
 
